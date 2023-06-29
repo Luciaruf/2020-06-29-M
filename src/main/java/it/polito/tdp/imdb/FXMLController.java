@@ -7,6 +7,10 @@ package it.polito.tdp.imdb;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+
+import it.polito.tdp.imdb.model.Director;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +23,8 @@ public class FXMLController {
 	
 	private Model model;
 
+	Graph<Director, DefaultWeightedEdge> grafo;
+	
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
@@ -35,10 +41,10 @@ public class FXMLController {
     private Button btnCercaAffini; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxAnno"
-    private ComboBox<?> boxAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxRegista"
-    private ComboBox<?> boxRegista; // Value injected by FXMLLoader
+    private ComboBox<Director> boxRegista; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtAttoriCondivisi"
     private TextField txtAttoriCondivisi; // Value injected by FXMLLoader
@@ -49,11 +55,25 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	txtResult.clear();
+    	txtResult.appendText("Crea grafo...\n");
+    	
+    	int anno = this.boxAnno.getValue();
+    	
+    	grafo = this.model.creaGrafo(anno);
+    	
+    	txtResult.appendText("grafo creato con "+grafo.vertexSet().size()+" vertici, e "+grafo.edgeSet().size()+" archi.\n");
+    	
+    	boxRegista.getItems().addAll(grafo.vertexSet());
+    	
     }
 
     @FXML
     void doRegistiAdiacenti(ActionEvent event) {
-
+    	
+    	Director director = boxRegista.getValue();
+    	
+    	txtResult.appendText("Componente connessa: "+ this.model.getAdiacenti(director));
     }
 
     @FXML
@@ -76,6 +96,10 @@ public class FXMLController {
    public void setModel(Model model) {
     	
     	this.model = model;
+    	
+    	for(int i=2004;i<=2006; i++) {
+    		this.boxAnno.getItems().add(i);
+    	}
     	
     }
     

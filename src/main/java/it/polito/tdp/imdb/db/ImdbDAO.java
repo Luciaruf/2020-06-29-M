@@ -84,6 +84,71 @@ public class ImdbDAO {
 		}
 	}
 	
+	public List<Director> directorsForYear(int anno){
+		String sql = "SELECT DISTINCT d.* "
+				+ "FROM `movies_directors` md, movies m, `directors` d "
+				+ "WHERE md.`director_id`=d.`id` AND m.`id`=md.`movie_id` "
+				+ "AND m.year=?";
+		
+		List<Director> result = new ArrayList<Director>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				Director director = new Director(res.getInt("id"), res.getString("first_name"), res.getString("last_name"));
+				
+				result.add(director);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<Actor> getActorsByDirectorId(int year,int director_id){
+		
+		String sql = "SELECT DISTINCT a.* "
+				+ "FROM roles r, `movies_directors` md, actors a, movies m "
+				+ "WHERE r.`movie_id`= md.`movie_id` "
+				+ "AND r.`actor_id`=a.`id` "
+				+ "AND m.`id`= md.`movie_id` "
+				+ "AND m.`year` = ? "
+				+ "AND md.`director_id`=? ";
+		
+		List<Actor> result = new ArrayList<Actor>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, year);
+			st.setInt(2, director_id);
+			
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				Actor actor = new Actor(res.getInt("id"), res.getString("first_name"), res.getString("last_name"),
+						res.getString("gender"));
+				
+				result.add(actor);
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
 	
 	
 	
